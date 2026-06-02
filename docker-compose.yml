@@ -1,63 +1,44 @@
 services:
   mysql:
     image: mysql:8.0
-    container_name: fleet-ai-mysql
-    restart: unless-stopped
+    container_name: nexus-ai-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-fleetai_root}
-      MYSQL_DATABASE: fleet_ai
-      MYSQL_USER: fleetai
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-fleetai123}
+      MYSQL_DATABASE: nexus_ai
+      MYSQL_USER: nexus
+      MYSQL_PASSWORD: nexus
+      MYSQL_ROOT_PASSWORD: root
     ports:
-      - '3306:3306'
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-uroot', '-pfleetai_root']
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
       timeout: 5s
-      retries: 15
-      start_period: 30s
+      retries: 20
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: fleet-ai-backend
-    restart: unless-stopped
+    container_name: nexus-ai-backend
+    build: ./backend
     environment:
       PORT: 4000
-      NODE_ENV: production
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: fleetai
-      DB_PASSWORD: ${MYSQL_PASSWORD:-fleetai123}
-      DB_NAME: fleet_ai
-      JWT_SECRET: ${JWT_SECRET:-fleet-ai-docker-secret}
-      USE_MOCK_DATA: ${USE_MOCK_DATA:-true}
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      JWT_SECRET: super-secret
+      CORS_ORIGIN: "*"
+      DATABASE_URL: mysql://root:fleetai_root@mysql:3306/fleet_ai
     ports:
-      - '4000:4000'
+      - "4000:4000"
     depends_on:
       mysql:
         condition: service_healthy
 
   frontend:
+    container_name: nexus-ai-frontend
     build:
       context: ./frontend
-      dockerfile: Dockerfile
       args:
-        BACKEND_URL: http://backend:4000
-        NEXT_PUBLIC_API_URL: /api
-    container_name: fleet-ai-frontend
-    restart: unless-stopped
-    environment:
-      HOSTNAME: 0.0.0.0
-      PORT: 3000
+        VITE_API_URL: http://localhost:4000/api
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       - backend
 

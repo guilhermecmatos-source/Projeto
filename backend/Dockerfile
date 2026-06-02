@@ -1,16 +1,22 @@
-FROM node:20-alpine AS build
+FROM node:20-bookworm-slim AS build
 WORKDIR /app
-COPY package.json package-lock.json* ./
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+COPY package*.json ./
 RUN npm ci
+COPY prisma ./prisma
+RUN npx prisma generate
 COPY tsconfig.json ./
-COPY src ./src
+COPY appsrc ./appsrc
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 WORKDIR /app
-ENV NODE_ENV=production
-COPY package.json package-lock.json* ./
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+COPY package*.json ./
 RUN npm ci --omit=dev
+COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
+COPY --from=build /app/node_modules/@prisma /app/node_modules/@prisma
+COPY prisma ./prisma
 COPY --from=build /app/dist ./dist
 EXPOSE 4000
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npx prisma db seed && node dist/index.js"]

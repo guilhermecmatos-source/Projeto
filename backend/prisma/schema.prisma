@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SOLICITANTE
+  MOTORISTA
+  GESTOR
+  COORDENADOR_TRANSPORTE
+  ADMINISTRADOR
+}
+
+enum FuelType {
+  ALCOOL
+  DIESEL
+  GASOLINA
+  ELETRICO
+  HIBRIDO
+}
+
+enum RuvStatus {
+  CRIADA
+  APROVADA_GESTOR
+  APROVADA_TRANSPORTE
+  REJEITADA
+  EM_EXECUCAO
+  CONCLUIDA
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  unit         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ruvs         Ruv[]    @relation("Requester")
+  audits       Audit[]
+}
+
+model Vehicle {
+  id                    Int       @id @default(autoincrement())
+  plate                 String    @unique
+  model                 String
+  brand                 String
+  year                  Int
+  fuel                  FuelType
+  capacity              Int
+  situation             String
+  km                    Int
+  lastMaintenanceDate   DateTime
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  ruvs                  Ruv[]
+}
+
+model Driver {
+  id           Int      @id @default(autoincrement())
+  name         String
+  cpf          String   @unique
+  cnh          String   @unique
+  category     String
+  cnhExpiry    DateTime
+  phone        String
+  status       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  trips        Trip[]
+  ruvs         Ruv[]
+}
+
+model Ruv {
+  id               Int       @id @default(autoincrement())
+  authorizationNo  String    @unique
+  emissionDate     DateTime
+  unit             String
+  center           String
+  expectedDate     DateTime
+  departureTime    String
+  returnTime       String
+  destination      String
+  service          String
+  objective        String
+  passengers       String
+  vehicleType      String
+  fuelType         FuelType
+  status           RuvStatus @default(CRIADA)
+  signature        String?
+  rejectionReason  String?
+  routeChangeNotes String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  requesterId      Int
+  vehicleId        Int?
+  driverId         Int?
+  requester        User      @relation("Requester", fields: [requesterId], references: [id])
+  vehicle          Vehicle?  @relation(fields: [vehicleId], references: [id])
+  driver           Driver?   @relation(fields: [driverId], references: [id])
+  trips            Trip[]
+
+  @@index([status])
+  @@index([expectedDate])
+}
+
+model Trip {
+  id              Int      @id @default(autoincrement())
+  ruvId           Int
+  driverId        Int?
+  startedAt       DateTime?
+  arrivedAt       DateTime?
+  location        String?
+  odometerStart   Int?
+  odometerEnd     Int?
+  distanceKm      Float?
+  fuelLiters      Float?
+  fuelCost        Float?
+  observations    String?
+  avgConsumption  Float?
+  tripCost        Float?
+  efficiency      Float?
+  createdAt       DateTime @default(now())
+  ruv             Ruv      @relation(fields: [ruvId], references: [id])
+  driver          Driver?  @relation(fields: [driverId], references: [id])
+}
+
+model InventoryItem {
+  id          Int      @id @default(autoincrement())
+  name        String
+  supplier    String
+  quantity    Int
+  minQuantity Int
+  unitCost    Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  clientId   Int
+  totalValue Float
+  status     String
+  createdAt  DateTime @default(now())
+  client     Client   @relation(fields: [clientId], references: [id])
+}
+
+model CommandIncident {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  status      String   @default("ABERTO")
+  corrective  String?
+  createdAt   DateTime @default(now())
+}
+
+model Audit {
+  id        Int      @id @default(autoincrement())
+  action    String
+  entity    String
+  entityId  String
+  details   String
+  userId    Int?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}

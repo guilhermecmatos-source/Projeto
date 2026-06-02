@@ -1,191 +1,62 @@
-# Fleet AI
+# Nexus AI
 
-<p align="center">
-  <strong>Plataforma SaaS de Decisão Empresarial com Inteligência Artificial</strong><br>
-  Logística · Operações · Estoque · Vendas · Automação · IA
-</p>
+Plataforma empresarial para gestão operacional, mobilidade corporativa, logística, frota, estoque, pedidos e inteligência empresarial.
 
----
+## Stack
 
-## Sobre o Projeto
+- Frontend: React + TypeScript + Vite + Tailwind + React Router + Axios + React Query
+- Backend: Node.js + Express + TypeScript + Prisma + JWT + Bcrypt
+- Banco: MySQL
+- Containerização: Docker + Docker Compose
 
-A **Fleet AI** não é apenas um sistema de gerenciamento de rotas. É uma **plataforma inteligente de tomada de decisão empresarial** voltada para empresas de logística, automação comercial, supermercados, distribuidoras, indústrias e transportadoras.
-
-O produto integra módulos operacionais com **CEO AI** (assistente executivo baseado em dados) e **Gêmeo Digital Empresarial** (simulação de cenários what-if), oferecendo uma experiência comparável a soluções enterprise do mercado.
-
-### Diferenciais
-
-| Recurso | Descrição |
-|---------|-----------|
-| **CEO AI** | Responde perguntas como *"Onde estou perdendo dinheiro?"* com base nos dados da operação |
-| **Gêmeo Digital** | Simula impactos de quebra de veículo, contratações, novas unidades e crescimento de demanda |
-| **Frota Futurista** | Suporte a caminhões, carros, motos, **drones** e **robôs autônomos** |
-| **Centro de Comando** | Monitoramento em tempo real e gestão de ocorrências |
-| **Simulação Empresarial** | Projeções financeiras para filiais, frota, CDs e demanda |
-
----
-
-## Stack Tecnológica
-
-| Camada | Tecnologias |
-|--------|-------------|
-| **Frontend** | Next.js 14, React 18, TypeScript, TailwindCSS, Recharts, Framer Motion |
-| **Backend** | Node.js, Express, TypeScript |
-| **Banco de Dados** | MySQL 8 |
-| **Arquitetura** | Modular, REST API, JWT |
-
----
-
-## Estrutura do Repositório
-
-```
-Projeto/
-├── frontend/          # Interface web (Next.js)
-├── backend/           # API REST (Express)
-├── database/          # Schema e seed SQL
-├── docs/              # Documentação técnica
-├── docker-compose.yml # MySQL para desenvolvimento
-└── README.md
-```
-
-Documentação detalhada:
-
-- [Arquitetura](docs/ARCHITECTURE.md)
-- [API REST](docs/API.md)
-- [Banco de Dados](docs/DATABASE.md)
-
----
-
-## Telas da Plataforma
-
-- Login
-- Dashboard Executivo
-- Veículos · Motoristas · Rotas
-- Estoque · Clientes · Pedidos
-- Centro de Comando
-- Simulações Empresariais
-- Gêmeo Digital
-- CEO AI
-- Configurações
-
----
-
-## Como Executar
-
-### Docker (recomendado — inclui mobile na rede Wi‑Fi)
+## Subir sem instalação manual
 
 ```bash
-cp .env.docker.example .env
 docker compose up -d --build
 ```
 
-- PC: http://localhost:3000  
-- Celular (mesma Wi‑Fi): `http://SEU_IP:3000` — veja o IP com `bash scripts/mobile-url.sh`
+URLs:
+- Frontend: http://localhost:3000
+- Backend: http://localhost:4000/api/health
 
-Guia completo: [docs/DOCKER.md](docs/DOCKER.md)
+Usuário padrão:
+- Email: `admin@nexusai.com`
+- Senha: `admin123`
+- Cargo: `ADMINISTRADOR`
 
-### Pré-requisitos (dev sem Docker)
+## Módulos implementados
 
-- Node.js 18+
-- npm
-- (Opcional) Docker só para MySQL
+- Dashboard Executivo
+- Gestão de Veículos (CRUD)
+- Gestão de Motoristas (CRUD)
+- Gestão de Usuários (CRUD com controle de acesso)
+- SMART RUV (fluxo, aprovação/reprovação, assinatura, histórico)
+- Movimentação de Veículo (saída, chegada, hodômetro, consumo, custo e eficiência)
+- Alteração de Rota
+- Estoque (CRUD)
+- Clientes (CRUD)
+- Pedidos (CRUD)
+- Centro de Comando com botão resolver problema
+- Relatórios (endpoint consolidado)
+- Auditoria e logs
+- CEO AI e módulo "O que a empresa não sabe"
 
-### 1. Backend
+## RBAC por cargo
 
-```bash
-cd backend
-cp .env.example .env
-npm install
-npm run dev
+- SOLICITANTE: cria solicitações e visualiza as suas
+- MOTORISTA: viagens, saída/chegada e abastecimento
+- GESTOR: aprova solicitações e relatórios
+- COORDENADOR_TRANSPORTE: veículos, motoristas e rota
+- ADMINISTRADOR: acesso total
+
+## Estrutura
+
 ```
-
-API disponível em: `http://localhost:4000/api`
-
-### 2. Frontend
-
-```bash
-cd frontend
-cp .env.local.example .env.local
-npm install
-npm run dev
+backend/
+  prisma/schema.prisma
+  prisma/seed.ts
+  appsrc/
+frontend/
+  appsrc/
+docker-compose.yml
 ```
-
-Aplicação em: `http://localhost:3000`
-
-### 3. Banco de Dados (opcional)
-
-```bash
-docker compose up -d mysql
-```
-
-> Por padrão, `USE_MOCK_DATA=true` permite rodar **sem MySQL** para demonstrações.
-
-### Credenciais de Demonstração
-
-| Campo | Valor |
-|-------|-------|
-| E-mail | `admin@fleetai.com` |
-| Senha | `fleetai123` |
-
----
-
-## Módulos da API
-
-| Módulo | Endpoint base |
-|--------|---------------|
-| Autenticação | `/api/auth` |
-| Dashboard | `/api/dashboard` |
-| Veículos | `/api/vehicles` |
-| Motoristas | `/api/drivers` |
-| Rotas | `/api/routes` |
-| Estoque | `/api/inventory` |
-| Comercial | `/api/commercial` |
-| Centro de Comando | `/api/command-center` |
-| Simulações | `/api/simulations` |
-| CEO AI | `/api/ceo-ai` |
-| Gêmeo Digital | `/api/digital-twin` |
-| IA | `/api/ai` |
-
----
-
-## Design
-
-Interface inspirada em produtos como Tesla, SpaceX, Notion, Stripe e Microsoft:
-
-- Tema escuro profissional
-- Animações suaves (Framer Motion)
-- Gráficos interativos (Recharts)
-- Componentes reutilizáveis (Card, StatCard, Badge, Button)
-
----
-
-## Contexto Acadêmico (TCC / SENAI)
-
-Este projeto foi estruturado para apresentação em **Trabalho de Conclusão de Curso (TCC)** ou projetos integradores do **SENAI**, demonstrando:
-
-1. **Análise de requisitos** — módulos alinhados a necessidades reais do setor logístico
-2. **Arquitetura de software** — separação frontend/backend, API REST modular
-3. **Modelagem de dados** — schema MySQL normalizado com relacionamentos
-4. **Interface de usuário** — UX enterprise com design system consistente
-5. **Inteligência artificial aplicada** — CEO AI e previsões baseadas em dados operacionais
-6. **Inovação** — Gêmeo Digital e frota com drones/robôs
-
-### Sugestão de Apresentação
-
-1. Problema: decisões empresariais fragmentadas em sistemas isolados
-2. Solução: Fleet AI como plataforma unificada
-3. Demo ao vivo: Login → Dashboard → CEO AI → Gêmeo Digital
-4. Arquitetura e tecnologias
-5. Conclusão e trabalhos futuros
-
----
-
-## Autor
-
-Projeto desenvolvido para fins educacionais e demonstração de competências em desenvolvimento full stack.
-
----
-
-## Licença
-
-Uso acadêmico e educacional.
