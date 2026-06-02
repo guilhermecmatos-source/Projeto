@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 
 import authRoutes from './modules/auth/auth.routes';
@@ -17,7 +18,23 @@ import aiRoutes from './modules/ai/ai.routes';
 
 const app = express();
 
-app.use(cors({ origin: ['http://localhost:3000', 'http://127.0.0.1:3000'], credentials: true }));
+const corsOrigin = env.corsOrigin;
+app.use(
+  cors({
+    origin:
+      corsOrigin === '*'
+        ? true
+        : corsOrigin
+          ? corsOrigin.split(',').map((o) => o.trim())
+          : [
+              'http://localhost:3000',
+              'http://127.0.0.1:3000',
+              /^http:\/\/192\.168\.\d+\.\d+:3000$/,
+              /^http:\/\/10\.\d+\.\d+\.\d+:3000$/,
+            ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {

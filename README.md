@@ -72,11 +72,23 @@ Documentação detalhada:
 
 ## Como Executar
 
-### Pré-requisitos
+### Docker (recomendado — inclui mobile na rede Wi‑Fi)
+
+```bash
+cp .env.docker.example .env
+docker compose up -d --build
+```
+
+- PC: http://localhost:3000  
+- Celular (mesma Wi‑Fi): `http://SEU_IP:3000` — veja o IP com `bash scripts/mobile-url.sh`
+
+Guia completo: [docs/DOCKER.md](docs/DOCKER.md)
+
+### Pré-requisitos (dev sem Docker)
 
 - Node.js 18+
 - npm
-- (Opcional) Docker para MySQL
+- (Opcional) Docker só para MySQL
 
 ### 1. Backend
 

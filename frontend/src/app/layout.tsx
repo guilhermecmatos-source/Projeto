@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   description: 'Inteligência artificial para logística, operações, estoque e vendas',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0a0a0f',
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className="dark">

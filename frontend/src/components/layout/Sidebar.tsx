@@ -18,6 +18,8 @@ import {
   LogOut,
   Sparkles,
   Cpu,
+  Menu,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -37,7 +39,12 @@ const navItems = [
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
 
   const logout = () => {
@@ -45,10 +52,10 @@ export function Sidebar() {
     window.location.href = '/login';
   };
 
-  return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-fleet-border bg-fleet-surface/95 backdrop-blur-xl flex flex-col">
-      <div className="p-6 border-b border-fleet-border">
-        <Link href="/dashboard" className="flex items-center gap-2">
+  const nav = (
+    <>
+      <div className="p-6 border-b border-fleet-border flex items-center justify-between">
+        <Link href="/dashboard" className="flex items-center gap-2" onClick={onMobileClose}>
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-fleet-accent to-fleet-cyan flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
@@ -57,6 +64,11 @@ export function Sidebar() {
             <p className="text-[10px] text-fleet-muted uppercase tracking-widest">Enterprise</p>
           </div>
         </Link>
+        {onMobileClose && (
+          <button type="button" onClick={onMobileClose} className="lg:hidden p-2 text-fleet-muted hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
@@ -67,6 +79,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onMobileClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
                 active
@@ -84,6 +97,7 @@ export function Sidebar() {
 
       <div className="p-3 border-t border-fleet-border">
         <button
+          type="button"
           onClick={logout}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-fleet-muted hover:text-fleet-danger hover:bg-fleet-danger/10 transition-colors"
         >
@@ -91,6 +105,48 @@ export function Sidebar() {
           Sair
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop */}
+      <aside className="hidden lg:flex fixed left-0 top-0 z-40 h-screen w-64 border-r border-fleet-border bg-fleet-surface/95 backdrop-blur-xl flex-col">
+        {nav}
+      </aside>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <button
+          type="button"
+          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          aria-label="Fechar menu"
+          onClick={onMobileClose}
+        />
+      )}
+
+      {/* Mobile drawer */}
+      <aside
+        className={cn(
+          'lg:hidden fixed left-0 top-0 z-50 h-screen w-[min(280px,85vw)] border-r border-fleet-border bg-fleet-surface flex flex-col transition-transform duration-300',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        {nav}
+      </aside>
+    </>
+  );
+}
+
+export function MobileMenuButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="lg:hidden p-2 rounded-lg bg-fleet-card border border-fleet-border text-white"
+      aria-label="Abrir menu"
+    >
+      <Menu className="w-5 h-5" />
+    </button>
   );
 }

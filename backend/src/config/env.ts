@@ -17,4 +17,5 @@ export const env = {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
   useMockData: process.env.USE_MOCK_DATA === 'true' || process.env.USE_MOCK_DATA === '1',
+  corsOrigin: process.env.CORS_ORIGIN || '',
 };
